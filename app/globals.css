@@ -71,6 +71,16 @@ h1 span { color: transparent; -webkit-text-stroke: 1.5px var(--cyan); }
 .method-note { margin: 0; padding: 12px; color: #71979e; font-size: 9px; line-height: 1.65; border-top: 1px solid var(--line); }
 
 footer { display: flex; flex-direction: column; gap: 7px; color: #56828a; font-size: 8px; letter-spacing: .7px; padding: 30px 4px 16px; position: relative; z-index: 1; }
+.packet-egg { position: fixed; right: 20px; bottom: 18px; z-index: 5; }
+.packet-egg summary { width: 20px; height: 14px; display: grid; place-items: center; border: 1px solid #28636d; background: #06181b; cursor: pointer; list-style: none; opacity: .28; transition: opacity .2s, border-color .2s; }
+.packet-egg summary::-webkit-details-marker { display: none; }
+.packet-egg summary:hover, .packet-egg summary:focus-visible, .packet-egg[open] summary { opacity: 1; border-color: var(--cyan); }
+.packet-glyph { display: flex; gap: 2px; }
+.packet-glyph i { width: 2px; height: 2px; background: var(--cyan); box-shadow: 0 0 3px var(--cyan); }
+.keyboard-secret { position: absolute; right: 0; bottom: 21px; width: min(360px, calc(100vw - 40px)); padding: 12px; border: 1px solid var(--cyan); background: #041416f7; box-shadow: 7px 7px 0 #082b30; color: var(--cyan); }
+.keyboard-secret p { margin: 0 0 10px; font-size: 8px; letter-spacing: .6px; }
+.keyboard-secret pre { margin: 0; overflow: hidden; color: #b7d8de; font: 8px/1.55 var(--font-mono), monospace; white-space: pre; }
+.keyboard-secret small { display: block; margin-top: 9px; color: var(--green); font-size: 7px; letter-spacing: .7px; }
 
 @media (min-width: 680px) {
   .shell { padding: 36px 52px 24px; }
