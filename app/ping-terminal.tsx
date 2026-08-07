@@ -144,6 +144,23 @@ export function PingTerminal() {
         <span>CLIENT-OBSERVED HTTPS RTT // NEAREST VERCEL EDGE</span>
         <span>NO DATA STORED // SECURE CONNECTION</span>
       </footer>
+
+      <details className="packet-egg">
+        <summary aria-label="Open hidden keyboard easter egg">
+          <span className="packet-glyph" aria-hidden="true"><i /><i /><i /></span>
+        </summary>
+        <div className="keyboard-secret">
+          <p>&gt; UNAUTHORIZED INPUT DEVICE DETECTED_</p>
+          <pre>{`┌──────────────────────────────────┐
+│ ESC  1  2  3  4  5  6  7  8  9 │
+│ TAB   Q  W  E  R  T  Y  U  I  O │
+│ CAPS   A  S  D  F  G  H  J  K   │
+│ SHIFT   Z  X  C  V  B  N  M  ↵  │
+│       [ DYCEM TERMINAL ]         │
+└──────────────────────────────────┘`}</pre>
+          <small>PACKET ACCEPTED // NICE FIND</small>
+        </div>
+      </details>
     </main>
   );
 }
