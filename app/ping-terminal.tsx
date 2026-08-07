@@ -79,8 +79,8 @@ export function PingTerminal() {
         <p className="eyebrow">DYCEM NETWORK UTILITY // v1.0</p>
         <h1>CHECK YOUR<br /><span>CONNECTION.</span></h1>
         <p className="intro">
-          Run a quick live latency test from this device to our network edge.
-          Eight packets. One clear result.
+          Send eight cache-bypassed HTTPS probes from this device to the nearest
+          Vercel edge region. We report client-observed round-trip latency and loss.
         </p>
       </section>
 
@@ -119,11 +119,29 @@ export function PingTerminal() {
             <span>{running ? "TEST IN PROGRESS" : samples.length ? "RUN AGAIN" : "RUN PING TEST"}</span>
             <b>{running ? "···" : "↗"}</b>
           </button>
+
+          <details className="methodology">
+            <summary>TEST METHODOLOGY <span>[EXPAND]</span></summary>
+            <div className="method-grid">
+              <p><span>TRANSPORT</span><b>HTTPS GET /api/ping</b></p>
+              <p><span>SAMPLE SET</span><b>8 sequential probes</b></p>
+              <p><span>CACHE</span><b>Bypassed + unique token</b></p>
+              <p><span>TIMEOUT</span><b>5,000 ms per probe</b></p>
+              <p><span>METRIC</span><b>Client wall-clock RTT</b></p>
+              <p><span>LOSS</span><b>Failed / aborted requests</b></p>
+            </div>
+            <p className="method-note">
+              This is application-layer HTTP latency, not ICMP ping. Results may
+              include connection setup, TLS, HTTP processing, browser scheduling,
+              and the network path to the hosting edge. It does not test Dycem’s
+              corporate network or data-center infrastructure.
+            </p>
+          </details>
         </div>
       </section>
 
       <footer>
-        <span>REAL-TIME BROWSER-TO-EDGE ROUND TRIP</span>
+        <span>CLIENT-OBSERVED HTTPS RTT // NEAREST VERCEL EDGE</span>
         <span>NO DATA STORED // SECURE CONNECTION</span>
       </footer>
     </main>
