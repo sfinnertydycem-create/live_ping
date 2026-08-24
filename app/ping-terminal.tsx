@@ -89,7 +89,7 @@ export function PingTerminal() {
           {!complete ? (
             <button className="primary full" onClick={runTest} disabled={running}>{running ? "TEST IN PROGRESS" : "RUN CONNECTION TEST"}<span>↘</span></button>
           ) : (
-            <div className="actions"><button className="primary" onClick={runTest}>RUN AGAIN <span>↻</span></button><a className="secondary" href={DATA_CENTERS_URL} target="_blank" rel="noreferrer">KEEP RUNNING FASTER <span>↘</span></a></div>
+            <div className="actions"><button className="primary" onClick={runTest}>RUN AGAIN <span>↻</span></button><a className="secondary" href={DATA_CENTERS_URL} target="_blank" rel="noreferrer">KEEP RUNNING FASTER WITH DYCEM <span>↘</span></a></div>
           )}
           <p className="privacy">NO DATA STORED / HISTORY CLEARS WHEN THIS PAGE CLOSES</p>
           <details className="methodology">
