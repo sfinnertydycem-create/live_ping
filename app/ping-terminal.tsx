@@ -3,8 +3,10 @@
 import { useMemo, useState } from "react";
 
 type Sample = { id: number; ms: number | null };
+type TestResult = { id: number; time: string; average: number | null; loss: number; label: string; samples: Sample[] };
 
 const SAMPLE_COUNT = 8;
+const DATA_CENTERS_URL = "https://dycem.com/industry/data-centers/";
 
 function quality(ms: number | null) {
   if (ms === null) return { label: "NO SIGNAL", className: "bad" };
@@ -14,153 +16,103 @@ function quality(ms: number | null) {
   return { label: "SLOW", className: "bad" };
 }
 
+function summarize(samples: Sample[]) {
+  const successful = samples.flatMap((sample) => sample.ms === null ? [] : [sample.ms]);
+  const average = successful.length ? Math.round(successful.reduce((sum, ms) => sum + ms, 0) / successful.length) : null;
+  const loss = samples.length ? Math.round(((samples.length - successful.length) / samples.length) * 100) : 0;
+  return { average, loss, result: quality(average) };
+}
+
 export function PingTerminal() {
   const [samples, setSamples] = useState<Sample[]>([]);
+  const [history, setHistory] = useState<TestResult[]>([]);
   const [running, setRunning] = useState(false);
-  const [status, setStatus] = useState("READY");
-
-  const successful = samples.flatMap((sample) =>
-    sample.ms === null ? [] : [sample.ms],
-  );
-  const average = successful.length
-    ? Math.round(successful.reduce((sum, ms) => sum + ms, 0) / successful.length)
-    : null;
-  const loss = samples.length
-    ? Math.round(((samples.length - successful.length) / samples.length) * 100)
-    : 0;
-  const result = quality(average);
-
-  const bars = useMemo(() => {
-    const values = samples.map((sample) => sample.ms);
-    return Array.from({ length: SAMPLE_COUNT }, (_, index) => values[index] ?? undefined);
-  }, [samples]);
+  const { average, loss, result } = summarize(samples);
+  const complete = samples.length === SAMPLE_COUNT && !running;
+  const bars = useMemo(() => Array.from({ length: SAMPLE_COUNT }, (_, index) => samples[index]?.ms), [samples]);
 
   async function runTest() {
     if (running) return;
     setRunning(true);
     setSamples([]);
-    setStatus("TESTING ROUTE");
+    const completedSamples: Sample[] = [];
 
     for (let id = 1; id <= SAMPLE_COUNT; id += 1) {
       const started = performance.now();
       let ms: number | null = null;
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 5000);
       try {
-        const controller = new AbortController();
-        const timeout = window.setTimeout(() => controller.abort(), 5000);
-        const response = await fetch(`/api/ping?t=${Date.now()}-${id}`, {
-          cache: "no-store",
-          signal: controller.signal,
-        });
-        window.clearTimeout(timeout);
+        const response = await fetch(`/api/ping?t=${Date.now()}-${id}`, { cache: "no-store", signal: controller.signal });
         if (response.ok) ms = Math.max(1, Math.round(performance.now() - started));
       } catch {
         ms = null;
+      } finally {
+        window.clearTimeout(timeout);
       }
-      setSamples((current) => [...current, { id, ms }]);
+      const sample = { id, ms };
+      completedSamples.push(sample);
+      setSamples([...completedSamples]);
       await new Promise((resolve) => window.setTimeout(resolve, 180));
     }
 
-    setStatus("TEST COMPLETE");
+    const summary = summarize(completedSamples);
+    setHistory((current) => [{ id: current.length + 1, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }), average: summary.average, loss: summary.loss, label: summary.result.label, samples: completedSamples }, ...current]);
     setRunning(false);
   }
 
   return (
-    <main className="shell">
-      <div className="scanlines" aria-hidden="true" />
-      <header className="topbar">
-        <div className="brand" aria-label="Dycem Data Centers">
-          <span className="brand-name">Dycem</span>
-          <span className="brand-unit">DATA CENTERS</span>
-        </div>
-        <div className="system-state"><i /> SYSTEM ONLINE</div>
+    <main>
+      <header className="site-header">
+        <a className="logo" href={DATA_CENTERS_URL} target="_blank" rel="noreferrer" aria-label="Dycem Data Centers">
+          <span><i>D</i>ycem<sup>®</sup></span><small>DATA CENTERS</small>
+        </a>
+        <span className="header-note">LIVE NETWORK UTILITY</span>
       </header>
 
-      <section className="hero">
-        <p className="eyebrow">DYCEM NETWORK UTILITY // v1.0</p>
-        <h1>CHECK YOUR<br /><span>CONNECTION.</span></h1>
-        <p className="intro">
-          Send eight cache-bypassed HTTPS probes from this device to the nearest
-          Vercel edge region. We report client-observed round-trip latency and loss.
-        </p>
-      </section>
-
-      <section className="terminal" aria-live="polite">
-        <div className="terminal-head">
-          <span>C:\DYCEM\GUEST&gt; PING_TEST.EXE</span>
-          <span className="window-controls">— □ ×</span>
+      <section className="hero-grid">
+        <div className="hero-copy dot-field">
+          <p className="kicker">DYCEM DATA CENTERS / CONNECTION TEST</p>
+          <h1>Keep Your<br />Connection <em>Running.</em></h1>
+          <p>Check this device’s live connection to the nearest hosting edge with eight real-time HTTPS probes.</p>
         </div>
-        <div className="terminal-body">
-          <div className="readout">
-            <p><span className="prompt">&gt;</span> STATUS <b>[{status}]</b></p>
-            <p><span className="prompt">&gt;</span> PACKETS <b>[{samples.length}/{SAMPLE_COUNT}]</b></p>
-            <p><span className="prompt">&gt;</span> PACKET LOSS <b>[{loss}%]</b></p>
+
+        <div className="test-panel" aria-live="polite">
+          <div className="panel-top"><span>LIVE CONNECTION TEST</span><b className={running ? "pulse" : ""}>{running ? "TESTING" : complete ? "COMPLETE" : "READY"}</b></div>
+          <div className="metrics">
+            <div className="main-metric"><span>AVERAGE LATENCY</span><strong>{average ?? "--"}<small>ms</small></strong><em className={result.className}>{samples.length ? result.label : "STANDBY"}</em></div>
+            <div className="side-metrics"><p><span>PROBES</span><b>{samples.length}/{SAMPLE_COUNT}</b></p><p><span>PACKET LOSS</span><b>{loss}%</b></p></div>
           </div>
-
-          <div className="result-grid">
-            <div className="score">
-              <span>AVERAGE LATENCY</span>
-              <strong>{average ?? "--"}<small>ms</small></strong>
-              <em className={result.className}>[{samples.length ? result.label : "STANDBY"}]</em>
-            </div>
-            <div className="graph" aria-label="Latency samples chart">
-              {bars.map((ms, index) => (
-                <div className="bar-slot" key={index}>
-                  <span
-                    className={ms === null ? "bar failed" : "bar"}
-                    style={{ height: ms === undefined ? 0 : ms === null ? "5%" : `${Math.min(100, Math.max(12, ms / 2.2))}%` }}
-                  />
-                  <small>{ms === undefined ? "·" : ms === null ? "×" : ms}</small>
-                </div>
-              ))}
-            </div>
+          <div className="graph" aria-label="Latency samples chart">
+            {bars.map((ms, index) => <div className="bar-slot" key={index}><span className={ms === null ? "bar failed" : "bar"} style={{ height: ms === undefined ? 0 : ms === null ? "5%" : `${Math.min(100, Math.max(12, ms / 2.2))}%` }} /><small>{ms === undefined ? "·" : ms === null ? "×" : ms}</small></div>)}
           </div>
-
-          <button className="run" onClick={runTest} disabled={running}>
-            <span>{running ? "TEST IN PROGRESS" : samples.length ? "RUN AGAIN" : "RUN PING TEST"}</span>
-            <b>{running ? "···" : "↗"}</b>
-          </button>
-
-          <details className="methodology">
-            <summary>TEST METHODOLOGY <span>[EXPAND]</span></summary>
-            <div className="method-grid">
-              <p><span>TRANSPORT</span><b>HTTPS GET /api/ping</b></p>
-              <p><span>SAMPLE SET</span><b>8 sequential probes</b></p>
-              <p><span>CACHE</span><b>Bypassed + unique token</b></p>
-              <p><span>TIMEOUT</span><b>5,000 ms per probe</b></p>
-              <p><span>METRIC</span><b>Client wall-clock RTT</b></p>
-              <p><span>LOSS</span><b>Failed / aborted requests</b></p>
-            </div>
-            <p className="method-note">
-              This is application-layer HTTP latency, not ICMP ping. Results may
-              include connection setup, TLS, HTTP processing, browser scheduling,
-              and the network path to the hosting edge. It does not test Dycem’s
-              corporate network or data-center infrastructure.
-            </p>
-          </details>
+          {!complete ? (
+            <button className="primary full" onClick={runTest} disabled={running}>{running ? "TEST IN PROGRESS" : "RUN CONNECTION TEST"}<span>↘</span></button>
+          ) : (
+            <div className="actions"><button className="primary" onClick={runTest}>RUN AGAIN <span>↻</span></button><a className="secondary" href={DATA_CENTERS_URL} target="_blank" rel="noreferrer">KEEP RUNNING FASTER <span>↘</span></a></div>
+          )}
+          <p className="privacy">NO DATA STORED / HISTORY CLEARS WHEN THIS PAGE CLOSES</p>
         </div>
       </section>
 
-      <footer>
-        <span>CLIENT-OBSERVED HTTPS RTT // NEAREST VERCEL EDGE</span>
-        <span>NO DATA STORED // SECURE CONNECTION</span>
-      </footer>
-
-      <details className="packet-egg">
-        <summary aria-label="Open hidden keyboard easter egg">
-          <span className="packet-glyph" aria-hidden="true"><i /><i /><i /></span>
-        </summary>
-        <div className="keyboard-secret">
-          <p>&gt; UNAUTHORIZED INPUT DEVICE DETECTED_</p>
-          <pre>{`┌──────────────────────────────────┐
-│ ESC  1  2  3  4  5  6  7  8  9 │
-│ TAB   Q  W  E  R  T  Y  U  I  O │
-│ CAPS   A  S  D  F  G  H  J  K   │
-│ SHIFT   Z  X  C  V  B  N  M  ↵  │
-│       [ DYCEM TERMINAL ]         │
-└──────────────────────────────────┘`}</pre>
-          <small>PACKET ACCEPTED // NICE FIND</small>
+      <section className="history-section">
+        <div className="section-title dot-field"><p>YOUR SESSION</p><h2>Connection Test <em>History</em></h2></div>
+        <div className="history-list">
+          {!history.length ? <div className="empty"><span>01</span><p>Your completed tests will appear here.</p></div> : history.map((test) => (
+            <article className="history-card" key={test.id}>
+              <div className="test-index"><span>TEST</span><b>{String(test.id).padStart(2, "0")}</b></div>
+              <div className="history-stat"><span>TIME</span><b>{test.time}</b></div>
+              <div className="history-stat"><span>AVERAGE</span><b>{test.average ?? "--"} ms</b></div>
+              <div className="history-stat"><span>LOSS</span><b>{test.loss}%</b></div>
+              <div className="history-stat"><span>RESULT</span><b className={quality(test.average).className}>{test.label}</b></div>
+              <div className="sample-row" aria-label="Individual readings">{test.samples.map((sample) => <i key={sample.id}>{sample.ms === null ? "×" : sample.ms}</i>)}</div>
+            </article>
+          ))}
         </div>
-      </details>
+      </section>
+
+      <footer><span>DY CEM® DATA CENTERS</span><span>CLIENT-OBSERVED HTTPS ROUND-TRIP TIME</span></footer>
     </main>
   );
 }
+
