@@ -92,6 +92,23 @@ export function PingTerminal() {
             <div className="actions"><button className="primary" onClick={runTest}>RUN AGAIN <span>↻</span></button><a className="secondary" href={DATA_CENTERS_URL} target="_blank" rel="noreferrer">KEEP RUNNING FASTER <span>↘</span></a></div>
           )}
           <p className="privacy">NO DATA STORED / HISTORY CLEARS WHEN THIS PAGE CLOSES</p>
+          <details className="methodology">
+            <summary>TEST METHODOLOGY <span>[EXPAND]</span></summary>
+            <div className="method-grid">
+              <p><span>TRANSPORT</span><b>HTTPS GET /api/ping</b></p>
+              <p><span>SAMPLE SET</span><b>8 sequential probes</b></p>
+              <p><span>CACHE</span><b>Bypassed + unique token</b></p>
+              <p><span>TIMEOUT</span><b>5,000 ms per probe</b></p>
+              <p><span>METRIC</span><b>Client wall-clock RTT</b></p>
+              <p><span>LOSS</span><b>Failed / aborted requests</b></p>
+            </div>
+            <p className="method-note">
+              This is application-layer HTTP latency, not ICMP ping. Results may include
+              connection setup, TLS, HTTP processing, browser scheduling, and the network
+              path to the hosting edge. It does not test Dycem’s corporate network or
+              data-center infrastructure.
+            </p>
+          </details>
         </div>
       </section>
 
@@ -112,6 +129,23 @@ export function PingTerminal() {
       </section>
 
       <footer><span>DYCEM® DATA CENTERS</span><span>CLIENT-OBSERVED HTTPS ROUND-TRIP TIME</span></footer>
+
+      <details className="packet-egg">
+        <summary aria-label="Open hidden keyboard surprise">
+          <span className="packet-glyph" aria-hidden="true"><i /><i /><i /></span>
+        </summary>
+        <div className="keyboard-secret">
+          <p>&gt; UNAUTHORIZED INPUT DEVICE DETECTED_</p>
+          <pre>{`┌──────────────────────────────────┐
+│ ESC  1  2  3  4  5  6  7  8  9 │
+│ TAB   Q  W  E  R  T  Y  U  I  O │
+│ CAPS   A  S  D  F  G  H  J  K   │
+│ SHIFT   Z  X  C  V  B  N  M  ↵  │
+│       [ DYCEM TERMINAL ]         │
+└──────────────────────────────────┘`}</pre>
+          <small>PACKET ACCEPTED // NICE FIND</small>
+        </div>
+      </details>
     </main>
   );
 }
