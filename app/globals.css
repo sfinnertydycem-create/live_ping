@@ -7,11 +7,8 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--white); fon
 button,a { font:inherit; }
 main { width:min(100%,1440px); margin:auto; border-left:1px solid var(--line); border-right:1px solid var(--line); }
 .site-header { min-height:69px; display:flex; align-items:center; justify-content:space-between; padding:10px clamp(24px,6vw,64px); border-bottom:1px solid var(--line); }
-.logo { color:white; text-decoration:none; display:flex; flex-direction:column; width:145px; line-height:.82; }
-.logo > span { font:700 27px/1 Georgia,serif; letter-spacing:-1px; }
-.logo i { display:inline-grid; place-items:center; width:39px; height:20px; margin-right:1px; border:1px solid white; border-radius:50%; font-style:italic; }
-.logo sup { font-size:8px; margin-left:2px; }
-.logo small { align-self:flex-end; background:var(--cyan); color:white; font-size:6px; letter-spacing:.7px; padding:2px 5px; margin-top:-1px; }
+.logo { display:block; width:176px; text-decoration:none; }
+.logo img { display:block; width:100%; height:auto; }
 .header-note,.kicker,.panel-top,.main-metric>span,.side-metrics span,.privacy,.section-title>p,.history-stat span,.test-index span { font-size:10px; letter-spacing:1.2px; }
 .header-note { color:var(--cyan); }
 .hero-grid { display:grid; grid-template-columns:1fr; border-bottom:1px solid var(--line); }
@@ -60,4 +57,5 @@ footer { display:flex; justify-content:space-between; padding:24px clamp(25px,6.
 @media(min-width:900px){.hero-grid{grid-template-columns:1fr 1fr}.hero-copy{border-right:1px solid var(--line);border-bottom:0}.history-section{grid-template-columns:.74fr 1.26fr}.section-title{border-right:1px solid var(--line);border-bottom:0}}
 @media(max-width:620px){.site-header{min-height:62px}.header-note{display:none}.hero-copy{min-height:390px}.metrics{grid-template-columns:1fr}.side-metrics{border-left:0;border-top:1px solid var(--line);padding:12px 0 0;display:grid;grid-template-columns:1fr 1fr}.actions{grid-template-columns:1fr}.history-card{grid-template-columns:repeat(2,1fr)}.test-index,.history-stat{min-height:75px}.sample-row{grid-column:1/-1}.history-stat:nth-child(5){grid-column:2}.history-card .sample-row{grid-template-columns:repeat(4,1fr)}footer{flex-direction:column;gap:8px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
 

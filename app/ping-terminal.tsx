@@ -65,7 +65,7 @@ export function PingTerminal() {
     <main>
       <header className="site-header">
         <a className="logo" href={DATA_CENTERS_URL} target="_blank" rel="noreferrer" aria-label="Dycem Data Centers">
-          <span><i>D</i>ycem<sup>®</sup></span><small>DATA CENTERS</small>
+          <img src="/dycem-data-centers-logo.png" alt="Dycem Data Centers" />
         </a>
         <span className="header-note">LIVE NETWORK UTILITY</span>
       </header>
@@ -115,4 +115,5 @@ export function PingTerminal() {
     </main>
   );
 }
+
 
