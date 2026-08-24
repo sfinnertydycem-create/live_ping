@@ -111,7 +111,7 @@ export function PingTerminal() {
         </div>
       </section>
 
-      <footer><span>DY CEM® DATA CENTERS</span><span>CLIENT-OBSERVED HTTPS ROUND-TRIP TIME</span></footer>
+      <footer><span>DYCEM® DATA CENTERS</span><span>CLIENT-OBSERVED HTTPS ROUND-TRIP TIME</span></footer>
     </main>
   );
 }
